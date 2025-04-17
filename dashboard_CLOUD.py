@@ -14,7 +14,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, FunctionTransformer
-import xgboost as xgb
+#import xgboost as xgb
 import requests
 from io import StringIO
 import streamviz 
