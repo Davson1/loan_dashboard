@@ -168,23 +168,19 @@ def load_model():
 
 @st.cache_data()  # Cache the feature names to avoid reloading
 def retrieve_feature_names():
-    #url = 'https://raw.githubusercontent.com/Isdinval/OC_PROJET7/main/feature_names.txt'
-    #response = requests.get(url)
-    #if response.status_code == 200:
+    url = 'https://raw.githubusercontent.com/Davson1/loan_dashboard/main/features_names.txt'
+    response = requests.get(url)
+    if response.status_code == 200:
         # Read the text content of the response
-        #text_data = response.text
+        text_data = response.text
     
         # Split the text by line breaks to get individual feature names
-        #feature_names = text_data.splitlines()
-        #return feature_names
-    #else:
-        #st.error("Failed to load data from GitHub.")
-        #return None
+        feature_names = text_data.splitlines()
+        return feature_names
+    else:
+        st.error("Failed to load data from GitHub.")
+        return None
     
-    text_data = "features_names.txt"
-    with open(text_data, 'r') as file:
-        feature_names = file.read().splitlines()
-    return feature_names
 
 
 
@@ -192,31 +188,27 @@ def retrieve_feature_names():
 # Load the test data
 @st.cache_data()   # Cache the test data to avoid reloading
 def load_test_data():
-    #url = 'https://raw.githubusercontent.com/Isdinval/OC_PROJET7/main/application_test.csv'
+    url = 'https://raw.githubusercontent.com/Davson1/loan_dashboard/main/application_test.csv'
 
-    #response = requests.get(url)
-    #if response.status_code == 200:
-        #return pd.read_csv(StringIO(response.text), delimiter=",")
-    #else:
-        #st.error("Failed to load data from GitHub.")
-        #return None
-    df = pd.read_csv('application_test.csv', delimiter=",")
-    print(df.columns)
-    return df
+    response = requests.get(url)
+    if response.status_code == 200:
+        return pd.read_csv(StringIO(response.text), delimiter=",")
+    else:
+        st.error("Failed to load data from GitHub.")
+        return None
+    
 
 
 # Load the test data
 @st.cache_data()   # Cache the test data to avoid reloading
 def load_test_data_description():
-    #url = 'https://raw.githubusercontent.com/Isdinval/OC_PROJET7/main/HomeCredit_columns_description.csv'
-    #response = requests.get(url)
-    #if response.status_code == 200:
-        #return pd.read_csv(StringIO(response.text))
-    #else:
-        #st.error("Failed to load data from GitHub.")
-        #return None
-    df = pd.read_csv("HomeCredit_columns_description.csv", encoding='ISO-8859-1')
-    return df
+    url = 'https://raw.githubusercontent.com/Davson1/loan_dashboard/main/HomeCredit_columns_description.csv'
+    response = requests.get(url)
+    if response.status_code == 200:
+        return pd.read_csv(StringIO(response.text))
+    else:
+        st.error("Failed to load data from GitHub.")
+        return None
 
 
 
@@ -225,7 +217,7 @@ def load_test_data_description():
 model = load_model()
 
 # Load FEATURE NAMES
-feature_names_from_Model = retrieve_feature_names()
+feature_names_from_Model =retrieve_feature_names()
 feature_names = feature_names_from_Model
 
 # Load Test DATA
@@ -579,7 +571,6 @@ def main():
             #model_columns = model.get_booster().feature_names
             #print(input_df.shape)
             #print(model_columns)
-            print(input_df.shape)
 
             input_df = input_df[model_columns]
 
@@ -589,7 +580,8 @@ def main():
 
             # Réorganiser les colonnes pour correspondre exactement à celles utilisées pour l'entraînement du modèle
             #input_df0 = input_df0[model_columns
-            input_df = input_df[model_columns]
+            #input_df = input_df[model_columns]
+            input_df.columns = feature_names
             input_df = input_df.astype(float)
             #input_df = input_df.values.reshape(1, -1) 
             #input_df= xgb.DMatrix(input_df)
@@ -598,7 +590,13 @@ def main():
             #model_xgb = final_estimator.get_booster()
             #explainer = shap.TreeExplainer(model_xgb)
             #shap_values = explainer.shap_values(input_df)
+            st.write("input_df.columns:", input_df)
+            st.write("input_df shape:", input_df.shape)
+            st.write("input_df.columns real:", list(input_df.columns))
             explainer = shap.TreeExplainer(final_estimator)
+            model_features = model.feature_names_in_
+            st.write("Nombre de features attendues par le modèle:", len(model_features))
+            input_df = input_df.reset_index(drop=True)
             shap_values = explainer.shap_values(input_df)
 
             instance_index = 0 # It is always 0 since there is only customer!
