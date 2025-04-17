@@ -1,0 +1,14 @@
+# Environnements virtuels
+.venv/
+env/
+venv/
+
+# Fichiers Python compilés
+__pycache__/
+*.py[cod]
+
+# Streamlit cache
+.streamlit/
+
+# Logs et autres
+*.log
